@@ -31,3 +31,4 @@ errorgen
 
 # Output from dlv test
 **/debug.*
+build/
