@@ -33,7 +33,7 @@ func applyOutboundSocketOptions(network string, address string, fd uintptr, conf
 		if err != nil {
 			return errors.New("failed to find the interface").Base(err)
 		}
-		isV4 := (network == "tcp4")
+		isV4 := (network == "tcp4" || network == "udp4")
 		if isV4 {
 			var bytes [4]byte
 			binary.BigEndian.PutUint32(bytes[:], uint32(inf.Index))
@@ -59,11 +59,6 @@ func applyOutboundSocketOptions(network string, address string, fd uintptr, conf
 		} else if config.TcpKeepAliveIdle < 0 {
 			if err := syscall.SetsockoptInt(syscall.Handle(fd), syscall.SOL_SOCKET, syscall.SO_KEEPALIVE, 0); err != nil {
 				return errors.New("failed to unset SO_KEEPALIVE", err)
-			}
-		}
-		if config.TcpNoDelay {
-			if err := syscall.SetsockoptInt(syscall.Handle(fd), syscall.IPPROTO_TCP, syscall.TCP_NODELAY, 1); err != nil {
-				return errors.New("failed to set TCP_NODELAY", err)
 			}
 		}
 	}
