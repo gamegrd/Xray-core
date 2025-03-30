@@ -32,11 +32,9 @@ auto:
 
 down:
 	mkdir -p $(build)
-	echo ">>> Download latest geoip.dat"
-	curl -s   -L -o $(build)/geoip.dat "https://github.com/v2fly/geoip/raw/release/geoip.dat"
+	echo ">>> Download latest geoip"
+	curl -s -L -o $(build)/geoip.dat https://github.com/v2fly/geoip/releases/latest/download/geoip.dat 
+	curl -s -L -o $(build)/geosite.dat https://github.com/v2fly/domain-list-community/releases/latest/download/dlc.dat 
+	curl -s -L -o $(build)/geoip.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat
+	curl -s -L -o $(build)/geosite.dat https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
 
-	echo ">>> Download latest geoip-only-cn-private.dat"
-	curl -s   -L -o $(build)/geoip-only-cn-private.dat "https://github.com/v2fly/geoip/raw/release/geoip-only-cn-private.dat"
-
-	echo ">>> Download latest geosite.dat"
-	curl -s   -L -o $(build)/geosite.dat "https://github.com/v2fly/domain-list-community/raw/release/dlc.dat"
