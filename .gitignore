@@ -45,3 +45,4 @@ errorgen
 # Certificates
 *.crt
 *.key
+build/
