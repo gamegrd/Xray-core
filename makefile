@@ -2,6 +2,9 @@
 build = $(shell pwd)/build
 all:openwrt android linux android windows
 
+install:
+	cp $(build)/linux/xray ../../xray/
+
 openwrt:
 	mkdir -p $(build)/openwrt
 	GOOS=linux GOARCH=mipsle GOMIPS=softfloat CGO_ENABLED=0   go build -o $(build)/openwrt/xray -trimpath -ldflags "-s -w -buildid=" ./main
