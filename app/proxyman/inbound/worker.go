@@ -2,6 +2,7 @@ package inbound
 
 import (
 	"context"
+	gonet "net"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -76,7 +77,25 @@ func (w *tcpWorker) callback(conn stat.Connection) {
 		case internet.SocketConfig_TProxy:
 			dest = net.DestinationFromAddr(conn.LocalAddr())
 		}
+
 		if dest.IsValid() {
+			// Check if try to connect to this inbound itself (can cause loopback)
+			var isLoopBack bool
+			if w.address == net.AnyIP || w.address == net.AnyIPv6 {
+				if dest.Port.Value() == w.port.Value() && IsLocal(dest.Address.IP()) {
+					isLoopBack = true
+				}
+			} else {
+				if w.hub.Addr().String() == dest.NetAddr() {
+					isLoopBack = true
+				}
+			}
+			if isLoopBack {
+				cancel()
+				conn.Close()
+				errors.LogError(ctx, errors.New("loopback connection detected"))
+				return
+			}
 			outbounds[0].Target = dest
 		}
 	}
@@ -322,10 +341,18 @@ func (w *udpWorker) callback(b *buf.Buffer, source net.Destination, originalDest
 				outbounds[0].Target = originalDest
 			}
 			ctx = session.ContextWithOutbounds(ctx, outbounds)
+			local := net.DestinationFromAddr(w.hub.Addr())
+			if local.Address == net.AnyIP || local.Address == net.AnyIPv6 {
+				if source.Address.Family().IsIPv4() {
+					local.Address = net.AnyIP
+				} else if source.Address.Family().IsIPv6() {
+					local.Address = net.AnyIPv6
+				}
+			}
 
 			ctx = session.ContextWithInbound(ctx, &session.Inbound{
 				Source:  source,
-				Local:   net.DestinationFromAddr(w.hub.Addr()),
+				Local:   local, // Due to some limitations, in UDP connections, localIP is always equal to listen interface IP
 				Gateway: net.UDPDestination(w.address, w.port),
 				Tag:     w.tag,
 			})
@@ -535,4 +562,19 @@ func (w *dsWorker) Close() error {
 	}
 
 	return nil
+}
+
+func IsLocal(ip net.IP) bool {
+	addrs, err := gonet.InterfaceAddrs()
+	if err != nil {
+		return false
+	}
+	for _, addr := range addrs {
+		if ipnet, ok := addr.(*gonet.IPNet); ok {
+			if ipnet.IP.Equal(ip) {
+				return true
+			}
+		}
+	}
+	return false
 }
