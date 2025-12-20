@@ -14,13 +14,14 @@ armv8:
 	mkdir -p $(build)/openwrt
 	GOOS=linux GOARCH=arm64 go build -o $(build)/openwrt/xray -trimpath -ldflags "-s -w -buildid=" ./main
 	cp $(build)/openwrt/xray ../../xwrt/
+	upx ../../xwrt/xray
 
 linux:
 	mkdir -p $(build)/linux
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0   go build -o $(build)/linux/xray -trimpath -ldflags "-s -w -buildid=" ./main
 	cp $(build)/linux/xray ../../xray/
 
-arm:
+armlinux:
 	mkdir -p $(build)/linux
 	GOOS=linux GOARCH=arm64 CGO_ENABLED=0   go build -o $(build)/arm/xray -trimpath -ldflags "-s -w -buildid=" ./main
 
