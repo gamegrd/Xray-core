@@ -9,6 +9,7 @@ mipsle:
 	mkdir -p $(build)/openwrt
 	GOOS=linux GOARCH=mipsle GOMIPS=softfloat CGO_ENABLED=0   go build -o $(build)/openwrt/xray -trimpath -ldflags "-s -w -buildid=" ./main
 	cp $(build)/openwrt/xray ../../xwrt/
+	upx ../../xwrt/xray
 
 armv8:
 	mkdir -p $(build)/openwrt
@@ -20,6 +21,7 @@ linux:
 	mkdir -p $(build)/linux
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0   go build -o $(build)/linux/xray -trimpath -ldflags "-s -w -buildid=" ./main
 	cp $(build)/linux/xray ../../xray/
+	upx ../../xray/xray
 
 armlinux:
 	mkdir -p $(build)/linux
@@ -29,6 +31,7 @@ android:
 	mkdir -p $(build)
 	GOOS=linux GOARCH=arm64 CGO_ENABLED=0   go build -o $(build)/android/xray -trimpath -ldflags "-s -w -buildid=" ./main
 	cp $(build)/android/xray ../../xandroid/
+	upx ../../xandroid/xray
 
 windows:
 	mkdir -p $(build)/windows
