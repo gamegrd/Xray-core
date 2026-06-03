@@ -1,6 +1,7 @@
+.PHONY: armv8 android linux osx auto down
 
 build = $(shell pwd)/build
-all:openwrt android linux android windows
+all: armv8 android linux
 
 install:
 	cp $(build)/linux/xray ../../xray/
