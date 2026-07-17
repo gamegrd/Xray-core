@@ -38,6 +38,7 @@ windows:
 	mkdir -p $(build)/windows
 	GOOS=windows GOARCH=amd64 CGO_ENABLED=0   go build -o $(build)/windows/xray.exe -trimpath -ldflags "-s -w -buildid=" ./main
 	upx $(build)/windows/xray.exe
+	
 osx:
 	mkdir -p $(build)/osx
 	GOOS=darwin CGO_ENABLED=0   go build -o $(build)/osx/xray -trimpath -ldflags "-s -w -buildid=" ./main
